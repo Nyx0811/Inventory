@@ -4,84 +4,268 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Update Inventory</title>
-  <link rel="stylesheet" href="CSS/update.css">
+  <link rel="stylesheet" href="CSS/Update.css" />
   <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script>
 </head>
-
 <body>
   <div class="sidebar">
     <button class="back-btn" onclick="window.location.href='INVDASH.html'">⤺ Back</button>
-    <div class="icon"><i class="fa-solid fa-clock-rotate-left fa-2x" style="color: #ffffff;"></i></div>
-    <div class="icon"><i class="fa-regular fa-bell fa-2x" style="color: #ffffff;"></i></div>
-    <div class="icon"><i class="fa-solid fa-user fa-2x" style="color: #ffffff;"></i></div>
+    <div class="icon"><i class="fa-solid fa-boxes-stacked fa-2x"></i></div>
+    <div class="icon"><i class="fa-regular fa-bell fa-2x"></i></div>
+    <div class="icon"><i class="fa-solid fa-user fa-2x"></i></div>
   </div>
 
   <div class="main">
     <div class="top-bar">
-      <h2>Update Inventory</h2>
+      <h2>Inventory</h2>
+      <div class="buttons">
+        <button onclick="location.href='ADDITEM.html'">Add Item</button>
+        <button onclick="location.href='UPDATEINV.html'">Update Inventory</button>
+        <button>Usage Graph</button>
+        <button onclick="location.href='ARCHITEM.html'">Archive Inventory</button>
+      </div>
     </div>
 
-    <form class="update-form" id="update-form">
-      <label for="invID">Inventory ID:</label>
-      <input type="text" id="invID" name="invID" required>
+    <div class="content">
+      <div class="form-section">
+        <div class="form-header">
+          <h3>Update Item</h3>
+          <span class="date-time" id="datetime">Loading...</span>
+        </div>
 
-      <label for="invName">Item Name:</label>
-      <input type="text" id="invName" name="invName" required>
+        <form id="update-form">
+          <div class="form-group">
+            <label for="inv-id">Inventory No.:</label>
+            <input type="text" id="inv-id" name="inv-id" readonly />
+            <label for="inv-name">Name:</label>
+            <input type="text" id="inv-name" name="inv-name" />
+          </div>
 
-      <label for="invDescription">Description:</label>
-      <textarea id="invDescription" name="invDescription" rows="4" required></textarea>
+          <label for="inv-description">Description:</label>
+          <textarea id="inv-description" name="inv-description"></textarea>
 
-      <label for="invCategory">Category:</label>
-      <select id="invCategory" name="invCategory" required>
-        <option value="Medicine">Medicine</option>
-        <option value="Medical Supplies">Medical Supplies</option>
-        <option value="Medical Equipment">Medical Equipment</option>
-      </select>
+          <label>Category:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="category" value="Medicine"> Medicine</label>
+            <label><input type="radio" name="category" value="Medical Supplies"> Medical Supplies</label>
+            <label><input type="radio" name="category" value="Medical Equipments"> Medical Equipment</label>
+          </div>
 
-      <label for="invDosage">Dosage:</label>
-      <input type="text" id="invDosage" name="invDosage" required>
+          <label for="inv-dosage">Dosage:</label>
+          <div class="dosage-group">
+            <input type="text" id="inv-dosage" name="inv-dosage"/>
+          </div>
 
-      <label for="invQuantity">Quantity:</label>
-      <input type="number" id="invQuantity" name="invQuantity" required>
+          <div class="form-group">
+            <label for="inv-quantity">Quantity:</label>
+            <input type="text" id="inv-quantity" name="inv-quantity" />
+          </div>
 
-      <label for="invSupplyDate">Supply Date:</label>
-      <input type="date" id="invSupplyDate" name="invSupplyDate" required>
+          <div class="form-group">
+            <label for="supply-date">Supply Date:</label>
+            <input type="date" id="supply-date" name="supply-date" />
+            <label for="expiry-date">Expiration Date:</label>
+            <input type="date" id="expiry-date" name="expiry-date" />
+          </div>
 
-      <label for="invExpiryDate">Expiration Date:</label>
-      <input type="date" id="invExpiryDate" name="invExpiryDate" required>
+          <button type="submit" id="update-btn" disabled>Update</button>
+        </form>
+      </div>
 
-      <button type="submit">Update Item</button>
-    </form>
+      <div class="table-section">
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search inventory..." class="search-box"/>
+        </div>
+
+        <h3>Select Item to Update:</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Inventory No.</th>
+              <th>Name</th>
+              <th>Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Inventory items will be displayed here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const updateForm = document.getElementById("update-form");
-
-      updateForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(updateForm);
-
-        fetch("UpdateItem.php", {
-          method: "POST",
-          body: formData
-        })
+    // Fetch inventory from the server based on search
+    function fetchInventory(searchTerm = '') {
+      fetch('fetch_inventory.php?search=' + encodeURIComponent(searchTerm))
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            alert("Inventory updated successfully!");
-            window.location.href = "architem.html"; // Redirect back to the archive page
-          } else {
-            alert("Failed to update inventory.");
-          }
+          renderTable(data);
         })
         .catch(error => {
-          console.error("Error updating inventory:", error);
-          alert("An error occurred while updating the inventory.");
+          console.error('Error fetching inventory:', error);
         });
+    }
+
+    // Render the inventory items
+    function renderTable(items) {
+      const tbody = document.querySelector('.table-section tbody');
+      tbody.innerHTML = '';
+
+      if (items.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="3">No results found.</td>`;
+        tbody.appendChild(row);
+        return;
+      }
+
+      items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.invID}</td>
+          <td>${item.invName}</td>
+          <td>${item.invCategory}</td>
+        `;
+        row.addEventListener('click', () => {
+          populateForm(item);
+        });
+        tbody.appendChild(row);
+      });
+    }
+
+    // 🔵 HELPER FUNCTION: Control the dosage field based on selected category
+    function handleDosageField() {
+      const selectedCategoryRadio = document.querySelector('input[name="category"]:checked');
+      const dosageField = document.getElementById('inv-dosage');
+
+      if (selectedCategoryRadio) {
+        const selectedCategory = selectedCategoryRadio.value.toLowerCase();
+
+        if (selectedCategory === 'medicine') {
+          dosageField.disabled = false;
+        } else {
+          dosageField.disabled = true;
+          dosageField.value = ''; // Optional: clear dosage if not applicable
+        }
+      }
+    }
+
+    // 🔵 WHEN loading an item from the table
+    function populateForm(item) {
+      document.getElementById('inv-id').value = item.invID || '';
+      document.getElementById('inv-name').value = item.invName || '';
+      document.getElementById('inv-description').value = item.invDescription || '';
+
+      if (item.invCategory) {
+        const radios = document.getElementsByName('category');
+        radios.forEach(radio => {
+          const radioValue = radio.value.trim().toLowerCase();
+          const itemCategory = item.invCategory.trim().toLowerCase();
+          radio.checked = (radioValue === itemCategory);
+        });
+      }
+
+      const dosageField = document.getElementById('inv-dosage');
+      dosageField.value = '';
+
+      if (item.invCategory && item.invCategory.toLowerCase() === "medicine") {
+        dosageField.value = item.invDosage ? item.invDosage : 'N/A';
+      }
+
+      handleDosageField(); // 🔵 call after populating form
+
+      document.getElementById('inv-quantity').value = item.itemQuantity || '';
+      document.getElementById('supply-date').value = item.invSupplyDate || '';
+      document.getElementById('expiry-date').value = item.invExpiryDate || '';
+
+      document.getElementById('update-btn').disabled = false;
+    }
+
+    // 🔵 WHEN manually changing the category
+    const categoryRadios = document.getElementsByName('category');
+    categoryRadios.forEach(radio => {
+      radio.addEventListener('change', handleDosageField);
+    });
+
+    // 🔵 Handle search
+    document.getElementById('search-input').addEventListener('input', function() {
+      const keyword = this.value.trim();
+      fetchInventory(keyword);
+    });
+
+    // 🔵 Load inventory on page load
+    fetchInventory();
+
+    // 🔵 Date and time
+    setInterval(() => {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      document.getElementById("datetime").textContent = now.toLocaleString('en-US', options);
+    }, 1000);
+
+    // 🔵 Handle form submission
+    document.getElementById('update-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!confirm('Are you sure you want to update this item?')) {
+        return;
+      }
+
+      const invID = document.getElementById('inv-id').value;
+      const invName = document.getElementById('inv-name').value;
+      const invDescription = document.getElementById('inv-description').value;
+      const categoryRadios = document.getElementsByName('category');
+      let invCategory = '';
+      categoryRadios.forEach(radio => {
+        if (radio.checked) {
+          invCategory = radio.value;
+        }
+      });
+      const invDosage = document.getElementById('inv-dosage').value;
+      const itemQuantity = document.getElementById('inv-quantity').value;
+      const invSupplyDate = document.getElementById('supply-date').value;
+      const invExpiryDate = document.getElementById('expiry-date').value;
+
+      fetch('UpdItem.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invID, invName, invDescription, invCategory, invDosage, itemQuantity, invSupplyDate, invExpiryDate
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'success') {
+          alert('Inventory updated successfully!');
+          fetchInventory();
+          clearForm();
+        } else {
+          alert('Error: ' + result.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error updating inventory:', error);
+        alert('An error occurred. Please try again.');
       });
     });
+
+    // 🔵 Clear form after update
+    function clearForm() {
+      document.getElementById('inv-id').value = '';
+      document.getElementById('inv-name').value = '';
+      document.getElementById('inv-description').value = '';
+      document.getElementById('inv-dosage').value = '';
+      document.getElementById('inv-quantity').value = '';
+      document.getElementById('supply-date').value = '';
+      document.getElementById('expiry-date').value = '';
+
+      const radios = document.getElementsByName('category');
+      radios.forEach(radio => radio.checked = false);
+
+      document.getElementById('inv-dosage').disabled = false;
+      document.getElementById('update-btn').disabled = true;
+    }
   </script>
+
 </body>
 </html>
