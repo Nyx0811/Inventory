@@ -10,8 +10,7 @@
 
 <body>
   <div class="sidebar">
-    <button class="back-btn" onclick="window.location.href='INVDASH.html'">⤺ Back</button>
-    <div class="icon"><i class="fa-solid fa-clock-rotate-left fa-2x" style="color: #ffffff;"></i></div>
+    <button id="backBtn" class="back-btn">⤺ Back</button>
     <div class="icon"><i class="fa-regular fa-bell fa-2x" style="color: #ffffff;"></i></div>
     <div class="icon"><i class="fa-solid fa-user fa-2x" style="color: #ffffff;"></i></div>
   </div>
@@ -20,10 +19,9 @@
     <div class="top-bar">
       <h2>Archive Inventory</h2>
       <div class="buttons">
-        <button>Add Item</button>
-        <button>Update Inventory</button>
-        <button>Usage Graph</button>
-        <button>Archive Inventory</button>
+        <button id="addBtn">Add Item</button>
+        <button id="updBtn">Update Inventory</button>
+        <button id="archBtn">Archive Inventory</button>
       </div>
     </div>
 
@@ -115,10 +113,22 @@ searchInput.addEventListener("input", () => {
       }, 1000);
     });
 
-    // Redirect to INVDASH when Back button is clicked
-    document.querySelector('.back-btn').addEventListener('click', () => {
-      window.location.href = "INVDASH.html";
-    });
+        document.getElementById("backBtn").addEventListener("click", () => {
+        window.location.href = "INVDASH.html";
+        });
+
+        document.getElementById("addBtn").addEventListener("click", () => {
+        window.location.href = "ADDITEM.html";
+        });
+        
+        document.getElementById("updBtn").addEventListener("click", () => {
+        window.location.href = "UPDATEINV.html";
+        });
+
+        document.getElementById("archBtn").addEventListener("click", () => {
+        window.location.href = "ARCHITEM.html";
+        });
+        
   </script>
 </body>
 </html>

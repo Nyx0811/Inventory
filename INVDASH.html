@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inventory Management</title>
+  <title>Inventory Dashboard</title>
   <link rel="Stylesheet" href="CSS/Inventory.css">
   <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div class="sidebar">
-    <button class="back-btn">⤺ Back</button>
-    <div class="icon"><i class="fa-solid fa-clock-rotate-left fa-2x" style="color: #ffffff;"></i></div>
+    <button id="backBtn">⤺ Back</button>
     <div class="icon"><i class="fa-regular fa-bell fa-2x" style="color: #ffffff;"></i></div>
     <div class="icon"><i class="fa-solid fa-user fa-2x" style="color: #ffffff;"></i></div>
   </div>
@@ -20,10 +19,9 @@
     <div class="top-bar">
       <h2>Inventory</h2>
       <div class="buttons">
-        <button id="addItemBtn">Add Item</button>
-        <button>Update Inventory</button>
-        <button>Usage Graph</button>
-        <button>Archive Inventory</button>
+        <button id="addBtn">Add Item</button>
+        <button id="updBtn">Update Inventory</button>
+        <button id="archBtn">Archive Inventory</button>
       </div>
     </div>
 
@@ -67,7 +65,7 @@
       const searchInput = document.getElementById("search-input");
 
       function fetchInventory(category = "", search = "") {
-        fetch(`fetch_inventory.php?category=${category}&search=${encodeURIComponent(search)}`)
+        fetch(`loadInv.php?category=${category}&search=${encodeURIComponent(search)}`)
           .then(res => res.json())
           .then(data => {
             tableBody.innerHTML = "";
@@ -114,7 +112,7 @@
           const confirmArchive = confirm("Are you sure you want to archive this item?");
           if (!confirmArchive) return;
 
-          fetch("archive_item.php", {
+          fetch("moveToArchive.php", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -146,11 +144,22 @@
       }, 1000);
     });
 
-    document.getElementById("addItemBtn").addEventListener("click", () => {
-    window.location.href = "ADDITEM.html";
+    document.getElementById("backBtn").addEventListener("click", () => {
+    window.history.back();
   });
 
 
+    document.getElementById("addBtn").addEventListener("click", () => {
+    window.location.href = "ADDITEM.html";
+  });
+   
+    document.getElementById("updBtn").addEventListener("click", () => {
+    window.location.href = "UPDATEINV.html";
+  });
+
+    document.getElementById("archBtn").addEventListener("click", () => {
+    window.location.href = "ARCHITEM.html";
+  });
   </script>
 </body>
 </html>

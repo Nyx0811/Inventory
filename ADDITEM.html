@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Item</title>
+  <title>Add Items</title>
   <link rel="Stylesheet" href="CSS/Add.css">
   <script src="https://kit.fontawesome.com/f543d9f8e5.js" crossorigin="anonymous"></script>
   
@@ -20,10 +20,9 @@
     <div class="top-bar">
       <h2>Inventory</h2>
       <div class="buttons">
-        <button>Add Item</button>
-        <button>Update Inventory</button>
-        <button>Usage Graph</button>
-        <button>Archive Inventory</button>
+        <button id="addBtn">Add Item</button>
+        <button id="updBtn">Update Inventory</button>
+        <button id="archBtn">Archive Inventory</button>
       </div>
     </div>
 
@@ -167,12 +166,12 @@
 
   // VALIDATIONS
   if (name === "") {
-    alert("Item name is required.");
+    alert("Item name can't be blank.");
     return;
   }
 
   if (quantity === "" || label === "") {
-    alert("Both quantity and label are required.");
+    alert("Input quantity and it's label.");
     return;
   }
 
@@ -217,7 +216,7 @@
     invExpiryDate: expiryDate
   };
 
-  fetch('add_item.php', {
+  fetch('insertInv.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -261,12 +260,23 @@
         });
 
         document.getElementById("backBtn").addEventListener("click", () => {
-        // Navigate back to INVDASH.html when the button is clicked
         window.location.href = "INVDASH.html";
-      });
-      
-      </script>
-      
+        });
 
+            document.getElementById("addBtn").addEventListener("click", () => {
+            window.location.href = "ADDITEM.html";
+        });
+        
+            document.getElementById("updBtn").addEventListener("click", () => {
+            window.location.href = "UPDATEINV.html";
+        });
+
+            document.getElementById("archBtn").addEventListener("click", () => {
+            window.location.href = "ARCHITEM.html";
+        });
+        
+
+      
+    </script>   
 </body>
 </html>

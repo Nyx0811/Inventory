@@ -9,8 +9,7 @@
 </head>
 <body>
   <div class="sidebar">
-    <button class="back-btn" onclick="window.location.href='INVDASH.html'">⤺ Back</button>
-    <div class="icon"><i class="fa-solid fa-boxes-stacked fa-2x"></i></div>
+    <button id="backBtn" class="back-btn">⤺ Back</button>
     <div class="icon"><i class="fa-regular fa-bell fa-2x"></i></div>
     <div class="icon"><i class="fa-solid fa-user fa-2x"></i></div>
   </div>
@@ -19,10 +18,9 @@
     <div class="top-bar">
       <h2>Inventory</h2>
       <div class="buttons">
-        <button onclick="location.href='ADDITEM.html'">Add Item</button>
-        <button onclick="location.href='UPDATEINV.html'">Update Inventory</button>
-        <button>Usage Graph</button>
-        <button onclick="location.href='ARCHITEM.html'">Archive Inventory</button>
+        <button id="addBtn">Add Item</button>
+        <button id="updBtn">Update Inventory</button>
+        <button id="archBtn">Archive Inventory</button>
       </div>
     </div>
 
@@ -97,7 +95,7 @@
   <script>
     // Fetch inventory from the server based on search
     function fetchInventory(searchTerm = '') {
-      fetch('fetch_inventory.php?search=' + encodeURIComponent(searchTerm))
+      fetch('loadInv.php?search=' + encodeURIComponent(searchTerm))
         .then(response => response.json())
         .then(data => {
           renderTable(data);
@@ -264,7 +262,23 @@
 
       document.getElementById('inv-dosage').disabled = false;
       document.getElementById('update-btn').disabled = true;
-    }
+    };
+            document.getElementById("backBtn").addEventListener("click", () => {
+            window.location.href = "INVDASH.html";
+        });
+
+            document.getElementById("addBtn").addEventListener("click", () => {
+            window.location.href = "ADDITEM.html";
+        });
+        
+            document.getElementById("updBtn").addEventListener("click", () => {
+            window.location.href = "UPDATEINV.html";
+        });
+
+            document.getElementById("archBtn").addEventListener("click", () => {
+            window.location.href = "ARCHITEM.html";
+        });
+        
   </script>
 
 </body>
